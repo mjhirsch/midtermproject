@@ -1,148 +1,146 @@
-var Trivia = {};
+angular.module('myApp',[]);
 
-Trivia.Game = function () {
-  this.key = "06a6a9bf065c2353b58de7eb390814d1";
-  this.tmdb = theMovieDb;
-  this.movies = [];
-  this.image_size = "w500";
-  this.current_title = [];
-  this.shuffled_title = [];
-  this.movie = {};
-  this.stage = 0;
-  this.retry = 3;
-  this.years = [];
-};
+var mainControllerFunc = function($scope, $http, $timeout){
+ 
+  // $scope.movies = []
+  $scope.genres = []
+  var theMovieDb ={}
+  theMovieDb = {
+    api_key: "?api_key=06a6a9bf065c2353b58de7eb390814d1",
+    base_uri: "http://api.themoviedb.org/3/",
+    images_uri: "http://image.tmdb.org/t/p/w780",
+    discover: "discover/movie",
+    with_genres: "&with_genres=",
+    release_year: "&language=en&primary_release_year="
+}
 
-Trivia.Game.prototype = {
-  init: function () {
-    this.tmdb.common.api_key = this.key;
-    for (var i = 2016 - 1; i >= 1990; i--) {
-      this.years.push(i);
-    };
-    this.shuffle(this.years);
-    var next = document.getElementById("next");
-    next.addEventListener("click", function (e) { this.updateStage(e); }.bind(this), false);
-    this.getMovies();
-  },
-  error: function (data) {
-    document.getElementById("error").setAttribute("class", "show");
-    console.log(data);
-  },
-  getMovies: function () {
-    var year = this.years.pop();
-    this.tmdb.discover.getMovies({year: year}, function (data) {
-      data = JSON.parse(data);
-      if(data.hasOwnProperty("results") && data.results.length > 0) {
-        for (var i = data.results.length - 1; i >= 0; i--) {
-            if(data.results[i]["title"].length < 15 && data.results[i]["backdrop_path"] != "") {
-              var item = { title: "", img: ""};
-              item.title = data.results[i]["title"].toUpperCase().split("");
-              item.img = data.results[i]["backdrop_path"];
-              this.movies.push(item);
-            }
+// console.log(theMovieDb.base_uri + 'genre/movie/list' + theMovieDb.api_key)
+$http.get(theMovieDb.base_uri + 'genre/movie/list' + theMovieDb.api_key).success(function(response){
+  // console.log(response.genres)
+  $scope.genres = response.genres 
+  // console.log($scope.genres)
+})
+
+  $scope.hideNext = true
+// http://api.themoviedb.org/3/discover/movie?api_key=06a6a9bf065c2353b58de7eb390814d1&sort_by=popularity.desc
+$scope.yearClick = function(){
+  $scope.movies = []
+
+  $scope.hideNext = false
+  theMovieDb.base_uri + theMovieDb.discover + theMovieDb.api_key + theMovieDb.release_year
+  var queryYear = ''
+  queryYear = theMovieDb.base_uri + theMovieDb.discover + theMovieDb.api_key + theMovieDb.release_year + $scope.yearValue
+  queryGenre = theMovieDb.base_uri + theMovieDb.discover + theMovieDb.api_key + theMovieDb.with_genres + $scope.selectedGenre 
+  // console.log(queryGenre)
+  // console.log(queryYear)
+
+    var getMovieData = function(index, cb){
+      // console.log(index)
+      var queryDetails = theMovieDb.base_uri + 'movie/' + $scope.movies[index].id +  theMovieDb.api_key
+      $http.get(queryDetails).success(function(response){
+        $scope.movies[index].details = response
+        cb(index)
+      })
+    }
+
+    var getImageData = function(index, cb){
+      // console.log(index)
+      var queryDetails = theMovieDb.base_uri + 'movie/' + $scope.movies[index].id + '/images' +theMovieDb.api_key
+      $http.get(queryDetails).success(function(response){
+        $scope.movies[index].backdrops = response.backdrops || []
+        cb()
+      })
+    }
+    
+    // for (var i = 0; i < response2.results.length; i++) {
+    //   $scope.movies.push(response2.results[i])
+    // };
+
+    for (var i = 1; i < 5; i++) {
+        var pageNumber = '&page='+i
+        // console.log(pageNumber)
+        // console.log(queryYear)
+        var movieQuery = ''
+        if ($scope.yearValue) {
+          movieQuery = queryYear
+        } else{
+          movieQuery = queryGenre
         };
-        this.updateStage();
-      } else {
-        this.error("No Data");
-      }
-    }.bind(this), this.error);
-  },
-  getMoviesSuccess: function (data) {
-    this.movies = data;
-    this.updateStage();
-  },
-  getImage: function (src) {
-    return this.tmdb.common.getImage({size: this.image_size, file: src});
-  },
-  updateImage: function (src) {
-    document.getElementById("poster").setAttribute("src", src);
-  },
-  updateStage: function () {
-    this.resetStage();
-    if(this.movies.length > 0) {
-      this.stage = this.stage + 1;
-      this.movie = this.movies.shift();
-      this.updateImage(this.getImage(this.movie.img));
-      this.createLetters();
-    } else {
-      this.movies = [];
-      this.getMovies();
-    }
-  },
-  createLetters: function () {
-    this.shuffled_title = this.movie.title.slice(0);
-    this.shuffled_title = this.shuffle(this.shuffled_title);
-    for (var i = this.shuffled_title.length - 1; i >= 0; i--) {
-      var node = document.createElement("li");
-      var text = document.createTextNode(this.shuffled_title[i]);
-      node.setAttribute("id", "letter-" + i);
-      node.addEventListener("click", function (e) { this.selectLetter(e); }.bind(this), false);
-      node.appendChild(text);
-      document.getElementById("letters_list").appendChild(node);
+        $http.get(movieQuery+pageNumber).success(function(response){ 
+        if ($scope.movies === undefined) {
+          $scope.movies = response.results
+        } else{
+          for (var i = 0; i < response.results.length; i++) {
+            $scope.movies.push(response.results[i])
+          };
+
+        };
+        
+        // console.log($scope.movies)
+        for (var b = 0; b < $scope.movies.length; b++) {
+          getMovieData(b, function(index){
+            getImageData(index, function(){
+
+            })
+          })    
+      };
+    })
     };
-  },
-  shuffle: function (o) {
-    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-    return o;
-  },
-  selectLetter: function (letter) {
-    document.getElementById(letter.target.id).setAttribute("class", "hide");
-    this.updateResult(letter.target.id, letter.target.innerText);
-  },
-  updateResult: function (id, text) {
-      var node = document.createElement("li");
-      var textNode = document.createTextNode(text);
-      node.setAttribute("id", "result-" + id);
-      node.addEventListener("click", function (e) { this.undoLetter(e); }.bind(this), false);
-      node.appendChild(textNode);
-      document.getElementById("result_list").appendChild(node);
-      this.current_title.push(text);
-      this.checkResult();
-  },
-  undoLetter: function (letter) {
-    this.current_title.pop();
-    var node = document.getElementById(letter.target.id);
-    node.parentNode.removeChild(node);
-    document.getElementById(letter.target.id.replace("result-","")).setAttribute("class", "show");
-  },
-  checkResult: function () {
-    var next = document.getElementById("next");
-    if(this.compareArrays(this.current_title, this.movie.title)) {
-      next.setAttribute("class", "show");
-      document.getElementById("success").setAttribute("class", "show");
-    } else {
-      next.setAttribute("class", "hide");
-    }
-  },
-  compareArrays: function (a, b) {
-    if (a.length != b.length)
-        return false;
 
-    for (var i = 0, l=a.length; i < l; i++) {
-      if (a[i] != b[i])
-        return false;
-    }
-    return true;
-  },
-  clearList: function (node) {
-    while (node.firstChild) {
-     node.removeChild(node.firstChild);
-    }
-  },
-  resetStage: function () {
-    this.current_title = [];
-    this.shuffled_title = [];
-    document.getElementById("next").setAttribute("class", "hide");
-    var results = document.getElementById("result_list");
-    this.clearList(results);
-    var letters = document.getElementById("letters_list");
-    this.clearList(letters);
-    document.getElementById("loader").setAttribute("class", "hide");
-    document.getElementById("success").setAttribute("class", "hide");
-    document.getElementById("error").setAttribute("class", "hide");
-    this.movie = {};
+
+            $timeout( function(){
+              $scope.imgUrl = theMovieDb.images_uri + $scope.movies[3].backdrops[1].file_path
+              $scope.displayAnswer = $scope.movies[3].original_title
+              // console.log($scope.movies)
+           }, 1500)
+    $scope.yearValue = ''
+    $scope.selectedGenre = ''          
   }
-};
 
-var game = new Trivia.Game();
-game.init();
+$scope.randomClick = function(){
+
+  $scope.answer=false
+  $scope.randomMovie = (Math.floor(Math.random()* $scope.movies.length))
+  console.log('randomMovie:', $scope.randomMovie)
+  console.log('Movies:', $scope.movies)
+  console.log($scope.movies[$scope.randomMovie].backdrops)
+  $scope.randomImage = (Math.floor(Math.random()* $scope.movies[$scope.randomMovie].backdrops.length))
+  // console.log($scope.movies )
+  // console.log($scope.randomMovie, ":randomMovie", $scope.randomImage, ":randomImage")
+  // console.log($scope.movies[$scope.randomMovie].backdrops[$scope.randomImage])
+  $scope.imgUrl = theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrops[$scope.randomImage].file_path || theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrop_path 
+
+}
+
+
+
+$scope.hideAnswer = function (){
+  // console.log($scope.movies)
+  // console.log($scope.movies[$scope.randomMovie])
+  $scope.answer = true
+  if ($scope.randomMovie === undefined) {
+    $scope.displayAnswer = $scope.movies[3].original_title
+  } else{
+    $scope.displayAnswer = $scope.movies[$scope.randomMovie].original_title
+  };
+}
+
+
+
+$scope.nextClick = function(){
+  // console.log($scope.randomMovie)
+  if ($scope.randomMovie === undefined) {
+     $scope.randomImage = (Math.floor(Math.random()* $scope.movies[3].backdrops.length))
+     $scope.imgUrl = theMovieDb.images_uri + $scope.movies[3].backdrops[$scope.randomImage].file_path || theMovieDb.images_uri + $scope.movies[3].backdrop_path
+
+  } else{
+     $scope.randomImage = (Math.floor(Math.random()* $scope.movies[$scope.randomMovie].backdrops.length))
+     $scope.imgUrl = theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrops[$scope.randomImage].file_path || theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrop_path
+  }; 
+ 
+  // console.log($scope.randomImage, ":randomImage")
+}
+
+
+}
+angular.module('myApp').controller('mainController',['$scope','$http', '$timeout', mainControllerFunc,])

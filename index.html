@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="myApp">
 <head>
 	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
@@ -7,10 +7,38 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.5/angular.min.js" type="text/javascript"></script>
 	
 	</script><script type="text/javascript" src="main.js"></script>
-	<script type="text/javascript" src="themoviedb.js">
+	<!-- <script type="text/javascript" src="themoviedb.js"></script> -->
 	<title>Yurp</title>
 </head>
-<body>
+<body ng-controller='mainController'>
+	
+	<div>
+		<input type="number" ng-model="yearValue">
+		<button ng-click="yearClick()" class="btn btn-primary">Submit</button>
+		<select class="btn btn-primary dropdown-toggle" ng-model='selectedGenre' ng-options="genre.id as genre.name for genre in genres">Genre</select>
+
+		
+<!-- 		<ul>
+			<li ng-repeat="movie in movies">
+				{{movie.original_title}}
+			</li>
+		</ul> -->
+	</div>
+
+	<div>
+		<div class="backgroundImageHolder" ng-click='randomClick()'>
+			<img ng-src='{{ imgUrl }}'>
+			
+		</div>
+		<div class="minheight" ng-click='hideAnswer()'>
+		
+			<div ng-show='answer'>
+				{{ displayAnswer }}
+			</div>
+		</div>
+		<button ng-click="nextClick()" ng-hide="hideNext" class="next">NEXT</button>
+	</div>
 
 </body>
 </html>
+

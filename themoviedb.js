@@ -580,7 +580,7 @@ theMovieDb.keywords = {
             {
                 url: "keyword/" + options.id + "/movies" + theMovieDb.common.generateQuery(options)
             },
-            success,
+           success,
             error
         );
     }
