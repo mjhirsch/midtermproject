@@ -16,8 +16,10 @@
 		<input type="number" ng-model="yearValue" placeholder="Year">
 		
 		<label>Genre:</label><select class="btn btn-primary dropdown-toggle" ng-model='selectedGenre' ng-options="genre.id as genre.name for genre in genres" name="Genre">Genre</select>
-		<button ng-click="yearClick()" class="btn btn-primary">Start</button>
-		<h1>{{data.value}} seconds left</h1>
+
+		<button ng-click="yearClick()" class="btn btn-primary" ng-disabled='disableStart'>Start</button>
+
+		<h1><span class='red'> {{data.value}}  </span>seconds left</h1>
 	</div>
 
 	<div>
@@ -25,10 +27,10 @@
 			<img ng-src='{{ imgUrl }}'>			
 		</div>
 		<div class="minheight" >
-			<h2>{{score}} points </h2>
+			<h2>  {{score}} points </h2>
 		</div>
 		<!-- <input ng-model="userResponse"> -->
-		<button ng-click="clickSubmit()" ng-hide="hideNext" class="next btn btn-primary" type="submit" ng-disabled="disableSubmit">Submit</button> 
+		
 		<button ng-click="nextClick()" ng-hide="hideNext" class="next btn btn-primary">Next Image</button>
 		<button ng-click='randomClick()' ng-hide="hideNext" class="btn btn-primary">Next Movie</button>
 		{{ displayResult }}
@@ -37,6 +39,9 @@
 				<input name='name' type="radio" ng-model="$parent.multipleChoiceAnswer" ng-value="answer.details.title">  {{answer.details.title}}
 			</label>		
 		</form>
+
+		<button ng-click="clickSubmit()" ng-hide="hideNext" class="next btn btn-primary" type="submit" ng-disabled="disableSubmit">Submit</button> 
+
 	</div>
 
 	<div class="outerIntro lightbox" ng-show='introBox' ng-click='exitInfoBox()'>
@@ -49,7 +54,11 @@
 
 	<div class="lightbox" ng-hide='replayBox' ng-click='hideReplay()'>
 			<div class="content">
-				<p><br>You scored {{score}} points, great job! <br><br><br>To play again click anywhere and choose either a year or genre.</p>
+				<p>You scored {{score}} points, great job! <br><br>To play again click anywhere and choose either a year or genre.</p>
+				<ul ng-repeat="score in scoresArray" class="list">
+					Top Scores
+					<li> {{score}} </li>
+				</ul>
 			</div>
 	</div>
 	</div>

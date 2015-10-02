@@ -1,6 +1,7 @@
 angular.module('myApp',[]);
 
 var mainControllerFunc = function($scope, $http, $timeout){
+  $scope.disableStart = false;
  $scope.replayBox = true
  $scope.scoresArray = []
  $scope.introBox = true
@@ -30,14 +31,15 @@ $http.get(theMovieDb.base_uri + 'genre/movie/list' + theMovieDb.api_key).success
 
 
 $scope.data = { 
-           value: 60,
+           value: 35,
            laps: []
        }
 
 // http://api.themoviedb.org/3/discover/movie?api_key=06a6a9bf065c2353b58de7eb390814d1&sort_by=popularity.desc
 $scope.yearClick = function(){
+  $scope.disableStart = true
   // console.log($scope.date)
-  $scope.data.value = 60
+  $scope.data.value = 35
   $scope.movies = []
   $scope.answerArray = []
   $scope.hideNext = false
@@ -70,7 +72,7 @@ $scope.yearClick = function(){
     //   $scope.movies.push(response2.results[i])
     // };
 
-    for (var i = 1; i < 5; i++) {
+    for (var i = 1; i < 6; i++) {
         var pageNumber = '&page='+i
         // console.log(pageNumber)
         // console.log(queryYear)
@@ -115,19 +117,20 @@ $scope.yearClick = function(){
               // console.log($scope.movies)
               $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
               $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
+              $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )
               $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] ) 
               $scope.answerArray.push( $scope.movies[3] )  
-
+              shuffle($scope.answerArray)
               console.log( $scope.answerArray)
 
-           }, 2500)
+           }, 3500)
 
     $scope.yearValue = ''
     $scope.selectedGenre = ''
 
     $timeout(function() {
       $scope.start()
-    }, 2500);
+    }, 3500);
   
   }
 
@@ -141,6 +144,7 @@ $scope.randomClick = function(){
   $scope.answerArray = []
   $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
   $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
+  $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] ) 
   $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] ) 
   console.log($scope.movies[$scope.randomMovie])
   $scope.answerArray.push( $scope.movies[$scope.randomMovie])
@@ -285,7 +289,7 @@ $scope.multipleChoiceAnswer = ""
                $scope.scoresArray.push($scope.score)
                $scope.replayBox = false
            }
-       }, 100);
+       }, 1000);
    };
 
    $scope.stop = function () {
@@ -316,6 +320,8 @@ $scope.exitInfoBox = function(){
 
 $scope.hideReplay = function(){
   $scope.replayBox = true
+  $scope.score = 0
+  $scope.disableStart = false
 }
 
 function shuffle(array) {

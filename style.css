@@ -48,5 +48,13 @@ label{
 }
 
 img{
-  border-radius: 3pt;
+  border-radius: 20pt;
+}
+
+.list{
+  list-style-type: none;
+}
+
+.red{
+  color: red;
 }
