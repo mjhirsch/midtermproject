@@ -55,10 +55,11 @@
 	<div class="lightbox" ng-hide='replayBox' ng-click='hideReplay()'>
 			<div class="content">
 				<p>You scored {{score}} points, great job! <br><br>To play again click anywhere and choose either a year or genre.</p>
-				<ul ng-repeat="score in scoresArray" class="list">
-					Top Scores
-					<li> {{score}} </li>
-				</ul>
+				<div ng-repeat="scores in scoresArray" class="list">
+					<h3>Top Scores</h3>
+					<p> {{scores}} </p>
+				</div>
+			
 			</div>
 	</div>
 	</div>

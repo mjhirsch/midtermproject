@@ -72,7 +72,7 @@ $scope.yearClick = function(){
     //   $scope.movies.push(response2.results[i])
     // };
 
-    for (var i = 1; i < 6; i++) {
+    for (var i = 1; i < 5; i++) {
         var pageNumber = '&page='+i
         // console.log(pageNumber)
         // console.log(queryYear)
@@ -123,14 +123,14 @@ $scope.yearClick = function(){
               shuffle($scope.answerArray)
               console.log( $scope.answerArray)
 
-           }, 3500)
+           }, 4100)
 
     $scope.yearValue = ''
     $scope.selectedGenre = ''
 
     $timeout(function() {
       $scope.start()
-    }, 3500);
+    }, 4000);
   
   }
 
