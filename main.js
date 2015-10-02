@@ -1,7 +1,12 @@
 angular.module('myApp',[]);
 
 var mainControllerFunc = function($scope, $http, $timeout){
- 
+ $scope.replayBox = true
+ $scope.scoresArray = []
+ $scope.introBox = true
+ $scope.score = 0
+ $scope.answerArray = []
+ $scope.userResponse = ''
   // $scope.movies = []
   $scope.genres = []
   var theMovieDb ={}
@@ -22,10 +27,19 @@ $http.get(theMovieDb.base_uri + 'genre/movie/list' + theMovieDb.api_key).success
 })
 
   $scope.hideNext = true
+
+
+$scope.data = { 
+           value: 60,
+           laps: []
+       }
+
 // http://api.themoviedb.org/3/discover/movie?api_key=06a6a9bf065c2353b58de7eb390814d1&sort_by=popularity.desc
 $scope.yearClick = function(){
+  // console.log($scope.date)
+  $scope.data.value = 60
   $scope.movies = []
-
+  $scope.answerArray = []
   $scope.hideNext = false
   theMovieDb.base_uri + theMovieDb.discover + theMovieDb.api_key + theMovieDb.release_year
   var queryYear = ''
@@ -89,26 +103,89 @@ $scope.yearClick = function(){
 
 
             $timeout( function(){
-              $scope.imgUrl = theMovieDb.images_uri + $scope.movies[3].backdrops[1].file_path
-              $scope.displayAnswer = $scope.movies[3].original_title
+              if ($scope.movies[3].backdrops) {
+                $scope.imgUrl = theMovieDb.images_uri + $scope.movies[3].backdrops[1].file_path
+                $scope.displayAnswer = $scope.movies[3].original_title
+              } else{
+                $scope.imgUrl = theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrop_path
+                $scope.displayAnswer = $scope.movies[3].original_title
+              };
+              // $scope.imgUrl = theMovieDb.images_uri + $scope.movies[3].backdrops[1].file_path
+              // $scope.displayAnswer = $scope.movies[3].original_title
               // console.log($scope.movies)
-           }, 1500)
+              $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
+              $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
+              $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] ) 
+              $scope.answerArray.push( $scope.movies[3] )  
+
+              console.log( $scope.answerArray)
+
+           }, 2500)
+
     $scope.yearValue = ''
-    $scope.selectedGenre = ''          
+    $scope.selectedGenre = ''
+
+    $timeout(function() {
+      $scope.start()
+    }, 2500);
+  
   }
 
 $scope.randomClick = function(){
-
+  $scope.disableSubmit = false;
+  $scope.displayResult = ''
+  $scope.userResponse = ''
   $scope.answer=false
   $scope.randomMovie = (Math.floor(Math.random()* $scope.movies.length))
-  console.log('randomMovie:', $scope.randomMovie)
-  console.log('Movies:', $scope.movies)
-  console.log($scope.movies[$scope.randomMovie].backdrops)
-  $scope.randomImage = (Math.floor(Math.random()* $scope.movies[$scope.randomMovie].backdrops.length))
+  $scope.displayAnswer = $scope.movies[$scope.randomMovie].original_title
+  $scope.answerArray = []
+  $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
+  $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
+  $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] ) 
+  console.log($scope.movies[$scope.randomMovie])
+  $scope.answerArray.push( $scope.movies[$scope.randomMovie])
+  shuffle($scope.answerArray)
+  console.log($scope.answerArray)
+  // console.log('randomMovie:', $scope.randomMovie)
+  // console.log('Movies:', $scope.movies)
+  // console.log($scope.movies[$scope.randomMovie].backdrops)
+  // console.log($scope.movies[$scope.randomMovie].backdrop_path)
+  console.log($scope.randomMovie, ":randomMovie", $scope.randomImage, ":randomImage")
+  console.log($scope.movies)
+
+  if ($scope.movies[$scope.randomMovie].backdrops && $scope.movies[$scope.randomMovie].backdrops.length > 1) {
+
+    $scope.randomImage = Math.floor(Math.random()* $scope.movies[$scope.randomMovie].backdrops.length)
+
+  } else{
+    console.log($scope.movies[$scope.randomMovie].backdrop_path)
+    if ($scope.movies[$scope.randomMovie].backdrop_path) {
+
+      $scope.imgUrl = theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrop_path
+
+    } else{
+
+      $scope.imgUrl = 'http://placekitten.com/780/400'
+      
+    };
+
+    
+
+  };
+  // $scope.randomImage = (Math.floor(Math.random()* $scope.movies[$scope.randomMovie].backdrops.length)) || theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrop_path
   // console.log($scope.movies )
-  // console.log($scope.randomMovie, ":randomMovie", $scope.randomImage, ":randomImage")
   // console.log($scope.movies[$scope.randomMovie].backdrops[$scope.randomImage])
-  $scope.imgUrl = theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrops[$scope.randomImage].file_path || theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrop_path 
+  if ($scope.movies[$scope.randomMovie].backdrops && $scope.movies[$scope.randomMovie].backdrops[$scope.randomImage]) {
+    $scope.imgUrl = (theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrops[$scope.randomImage].file_path)
+  } else{
+    if ($scope.movies[$scope.randomMovie].backdrop_path) {
+      $scope.imgUrl = (theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrop_path)
+    } else{
+       
+      $scope.imgUrl = 'http://placekitten.com/780/400'
+    };
+    
+  };
 
 }
 
@@ -118,27 +195,146 @@ $scope.hideAnswer = function (){
   // console.log($scope.movies)
   // console.log($scope.movies[$scope.randomMovie])
   $scope.answer = true
-  if ($scope.randomMovie === undefined) {
-    $scope.displayAnswer = $scope.movies[3].original_title
-  } else{
-    $scope.displayAnswer = $scope.movies[$scope.randomMovie].original_title
-  };
+  // if ($scope.randomMovie === undefined) {
+  //   $scope.displayAnswer = $scope.movies[3].original_title
+  // } else{
+  //   $scope.displayAnswer = $scope.movies[$scope.randomMovie].original_title
+  // };
 }
 
 
 
 $scope.nextClick = function(){
   // console.log($scope.randomMovie)
+
   if ($scope.randomMovie === undefined) {
-     $scope.randomImage = (Math.floor(Math.random()* $scope.movies[3].backdrops.length))
+     $scope.randomImage = (Math.floor(Math.random()* $scope.movies[3].backdrops.length)) 
      $scope.imgUrl = theMovieDb.images_uri + $scope.movies[3].backdrops[$scope.randomImage].file_path || theMovieDb.images_uri + $scope.movies[3].backdrop_path
 
   } else{
+    console.log($scope.movies)
+
+     if ($scope.movies[$scope.randomMovie].backdrops && $scope.movies[$scope.randomMovie].backdrops.length > 1) {
+
      $scope.randomImage = (Math.floor(Math.random()* $scope.movies[$scope.randomMovie].backdrops.length))
-     $scope.imgUrl = theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrops[$scope.randomImage].file_path || theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrop_path
+     console.log($scope.randomMovie, $scope.randomImage)
+     $scope.imgUrl = theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrops[$scope.randomImage].file_path
+
+
+     } else{
+      console.log($scope.movies[$scope.randomMovie].backdrop_path)
+      if ($scope.movies[$scope.randomMovie].backdrop_path) {
+        $scope.imgUrl = theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrop_path
+      } else{
+        $scope.imgUrl = 'http://placekitten.com/780/400'
+      };
+
+      
+     };
+     // $scope.randomImage = (Math.floor(Math.random()* $scope.movies[$scope.randomMovie].backdrops.length))
+     // $scope.imgUrl = theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrops[$scope.randomImage].file_path || theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrop_path
   }; 
  
   // console.log($scope.randomImage, ":randomImage")
+}
+
+$scope.clickSubmit = function (){
+  // console.log($scope.multipleChoiceAnswer)
+    $scope.disableSubmit = true;
+    if ($scope.multipleChoiceAnswer === $scope.displayAnswer) {
+      $scope.displayResult = 'Correct'
+      $scope.score++
+      $scope.randomClick();
+      $scope.disableSubmit = false;
+      // $scope.randomClick();
+    } else{
+      $scope.displayResult = 'Incorrect'
+      $scope.disableSubmit = false;
+    }
+
+}
+
+$scope.multipleChoiceAnswer = ""
+
+// $scope.counter = 45;
+//    $scope.onTimeout = function(){
+//        $scope.counter--;
+//        mytimeout = $timeout($scope.onTimeout,1000);
+//        if($scope.counter === 0) {
+//           $timeout.cancel(mytimeout)
+//    }
+//    }
+//    var mytimeout = $timeout($scope.onTimeout,1000);
+   
+//    $scope.stop = function(){
+//        $timeout.cancel(mytimeout);
+//    }
+
+// $scope.data = { 
+//            value: 60,
+//            laps: []
+//        },
+       stopwatch = null;
+       
+   $scope.start = function () {;
+       stopwatch = $timeout(function() {
+           $scope.data.value--;
+           $scope.start();
+           if($scope.data.value === 0){
+               $scope.stop()
+               $scope.scoresArray.push($scope.score)
+               $scope.replayBox = false
+           }
+       }, 100);
+   };
+
+   $scope.stop = function () {
+       $timeout.cancel(stopwatch);
+       stopwatch = null;
+   };
+
+   $scope.reset = function () {
+       $scope.stop()
+       $scope.data.value = 60;
+       $scope.data.laps = [];
+   };
+
+   $scope.lap = function () {
+       $scope.data.laps.push($scope.data.value);
+   };
+
+   // return {
+   //     data: $scope.data,
+   //     start: $scope.start,
+   //     stop: $scope.stop,
+   //     reset: $scope.reset,
+   //     lap: $scope.lap
+   // };
+$scope.exitInfoBox = function(){
+  $scope.introBox = false
+}
+
+$scope.hideReplay = function(){
+  $scope.replayBox = true
+}
+
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex ;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
 }
 
 

@@ -4,40 +4,56 @@
 	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="style.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.5/angular.min.js" type="text/javascript"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-beta.0/angular.min.js" type="text/javascript"></script>
 	
 	</script><script type="text/javascript" src="main.js"></script>
 	<!-- <script type="text/javascript" src="themoviedb.js"></script> -->
 	<title>Yurp</title>
 </head>
 <body ng-controller='mainController'>
-	
-	<div>
-		<input type="number" ng-model="yearValue">
-		<button ng-click="yearClick()" class="btn btn-primary">Submit</button>
-		<select class="btn btn-primary dropdown-toggle" ng-model='selectedGenre' ng-options="genre.id as genre.name for genre in genres">Genre</select>
-
+	<div class="content-container">
+		<div class="input-area">
+		<input type="number" ng-model="yearValue" placeholder="Year">
 		
-<!-- 		<ul>
-			<li ng-repeat="movie in movies">
-				{{movie.original_title}}
-			</li>
-		</ul> -->
+		<label>Genre:</label><select class="btn btn-primary dropdown-toggle" ng-model='selectedGenre' ng-options="genre.id as genre.name for genre in genres" name="Genre">Genre</select>
+		<button ng-click="yearClick()" class="btn btn-primary">Start</button>
+		<h1>{{data.value}} seconds left</h1>
 	</div>
 
 	<div>
 		<div class="backgroundImageHolder" ng-click='randomClick()'>
-			<img ng-src='{{ imgUrl }}'>
-			
+			<img ng-src='{{ imgUrl }}'>			
 		</div>
-		<div class="minheight" ng-click='hideAnswer()'>
-		
-			<div ng-show='answer'>
-				{{ displayAnswer }}
-			</div>
+		<div class="minheight" >
+			<h2>{{score}} points </h2>
 		</div>
-		<button ng-click="nextClick()" ng-hide="hideNext" class="next">NEXT</button>
+		<!-- <input ng-model="userResponse"> -->
+		<button ng-click="clickSubmit()" ng-hide="hideNext" class="next btn btn-primary" type="submit" ng-disabled="disableSubmit">Submit</button> 
+		<button ng-click="nextClick()" ng-hide="hideNext" class="next btn btn-primary">Next Image</button>
+		<button ng-click='randomClick()' ng-hide="hideNext" class="btn btn-primary">Next Movie</button>
+		{{ displayResult }}
+		<form name="name">
+			<label ng-repeat="answer in answerArray track by $index">
+				<input name='name' type="radio" ng-model="$parent.multipleChoiceAnswer" ng-value="answer.details.title">  {{answer.details.title}}
+			</label>		
+		</form>
 	</div>
+
+	<div class="outerIntro lightbox" ng-show='introBox' ng-click='exitInfoBox()'>
+		<div class="content innerIntro">
+			<h1>Instructions</h1>
+			<p>Select EITHER a <b>Year</b> or <b>Genre</b> and choose the correct movie title for the image. <br><br> You get 1 point for every correct answer. <br> Try and get the high score! <br><br><br>Tip: click next image for additional images from the movie (but don't forget that you only have 60 seconds per round!</p>
+			<!-- <div><a href="#">Close</a></div> -->
+		</div>
+	</div>
+
+	<div class="lightbox" ng-hide='replayBox' ng-click='hideReplay()'>
+			<div class="content">
+				<p><br>You scored {{score}} points, great job! <br><br><br>To play again click anywhere and choose either a year or genre.</p>
+			</div>
+	</div>
+	</div>
+	
 
 </body>
 </html>
