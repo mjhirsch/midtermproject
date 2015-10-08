@@ -37,7 +37,7 @@ label{
 .content {
   border-radius: 6px;
   position: absolute;
-  top: 50%;
+  top: 35%;
   right: 10%;
   left: 10%;
   transform: translateY(-50%);

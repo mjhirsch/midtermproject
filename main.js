@@ -1,8 +1,9 @@
 angular.module('myApp',[]);
 
 var mainControllerFunc = function($scope, $http, $timeout){
-  $scope.disableStart = false;
+ $scope.disableStart = false;
  $scope.replayBox = true
+ $scope.loadingBox = false
  $scope.scoresArray = []
  $scope.introBox = true
  $scope.score = 0
@@ -37,6 +38,7 @@ $scope.data = {
 
 // http://api.themoviedb.org/3/discover/movie?api_key=06a6a9bf065c2353b58de7eb390814d1&sort_by=popularity.desc
 $scope.yearClick = function(){
+  $scope.loadingBox = true
   $scope.disableStart = true
   // console.log($scope.date)
   $scope.data.value = 35
@@ -72,7 +74,7 @@ $scope.yearClick = function(){
     //   $scope.movies.push(response2.results[i])
     // };
 
-    for (var i = 1; i < 5; i++) {
+    for (var i = 1; i < 2; i++) {
         var pageNumber = '&page='+i
         // console.log(pageNumber)
         // console.log(queryYear)
@@ -107,30 +109,43 @@ $scope.yearClick = function(){
             $timeout( function(){
               if ($scope.movies[3].backdrops) {
                 $scope.imgUrl = theMovieDb.images_uri + $scope.movies[3].backdrops[1].file_path
-                $scope.displayAnswer = $scope.movies[3].original_title
+                $scope.displayAnswer = $scope.movies[3].details.original_title
               } else{
                 $scope.imgUrl = theMovieDb.images_uri + $scope.movies[$scope.randomMovie].backdrop_path
-                $scope.displayAnswer = $scope.movies[3].original_title
+                $scope.displayAnswer = $scope.movies[3].details.original_title
               };
               // $scope.imgUrl = theMovieDb.images_uri + $scope.movies[3].backdrops[1].file_path
               // $scope.displayAnswer = $scope.movies[3].original_title
-              // console.log($scope.movies)
-              $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
-              $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
-              $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )
-              $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] ) 
-              $scope.answerArray.push( $scope.movies[3] )  
+              console.log($scope.movies)
+              for (var i = 5; i > $scope.answerArray.length; i--) {
+                var movieAnswerChoice = $scope.movies[(Math.floor(Math.random()* $scope.movies.length))].details.original_title
+                console.log("answermoviechoic:", movieAnswerChoice)
+                console.log("displayAnswer:", $scope.displayAnswer)
+                if (movieAnswerChoice == $scope.displayAnswer) {
+                  movieAnswerChoice = $scope.movies[(Math.floor(Math.random()* $scope.movies.length))].details.original_title
+                }
+
+                $scope.answerArray.push(movieAnswerChoice)  
+
+
+              };
+              // $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))].details.original_title )  
+              // $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
+              // $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )
+              // $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] ) 
+              $scope.answerArray.push( $scope.movies[3].details.original_title )  
               shuffle($scope.answerArray)
               console.log( $scope.answerArray)
 
-           }, 4100)
+           }, 6200)
 
     $scope.yearValue = ''
     $scope.selectedGenre = ''
 
     $timeout(function() {
-      $scope.start()
-    }, 4000);
+      $scope.start();
+      $scope.loadingBox = false
+    }, 6000);
   
   }
 
@@ -140,16 +155,38 @@ $scope.randomClick = function(){
   $scope.userResponse = ''
   $scope.answer=false
   $scope.randomMovie = (Math.floor(Math.random()* $scope.movies.length))
-  $scope.displayAnswer = $scope.movies[$scope.randomMovie].original_title
+  $scope.displayAnswer = $scope.movies[$scope.randomMovie].details.original_title
   $scope.answerArray = []
-  $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
-  $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
-  $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] ) 
-  $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] ) 
-  console.log($scope.movies[$scope.randomMovie])
-  $scope.answerArray.push( $scope.movies[$scope.randomMovie])
+
+  for (var i = 6; i > $scope.answerArray.length; i--) {
+    var movieAnswerChoice = $scope.movies[(Math.floor(Math.random()* $scope.movies.length))].details.original_title
+    console.log("answermoviechoic:", movieAnswerChoice)
+    console.log("displayAnswer:", $scope.displayAnswer)
+    if (movieAnswerChoice == $scope.displayAnswer) {
+      movieAnswerChoice = $scope.movies[(Math.floor(Math.random()* $scope.movies.length))].details.original_title
+    }
+
+    $scope.answerArray.push(movieAnswerChoice)  
+
+
+  };
+  // $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))].details.original_title )  
+  // $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
+  // $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )
+  // $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] ) 
+  $scope.answerArray.push( $scope.movies[$scope.randomMovie].details.original_title )  
   shuffle($scope.answerArray)
-  console.log($scope.answerArray)
+  console.log( $scope.answerArray)
+
+
+  // $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
+  // $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] )  
+  // $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] ) 
+  // $scope.answerArray.push( $scope.movies[(Math.floor(Math.random()* $scope.movies.length))] ) 
+  // console.log($scope.movies[$scope.randomMovie])
+  // $scope.answerArray.push( $scope.movies[$scope.randomMovie])
+  // shuffle($scope.answerArray)
+  // console.log($scope.answerArray)
   // console.log('randomMovie:', $scope.randomMovie)
   // console.log('Movies:', $scope.movies)
   // console.log($scope.movies[$scope.randomMovie].backdrops)

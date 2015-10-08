@@ -14,7 +14,7 @@
 	<div class="content-container">
 		<div class="input-area">
 		<input type="number" ng-model="yearValue" placeholder="Year">
-		
+		<b>OR</b>
 		<label>Genre:</label><select class="btn btn-primary dropdown-toggle" ng-model='selectedGenre' ng-options="genre.id as genre.name for genre in genres" name="Genre">Genre</select>
 
 		<button ng-click="yearClick()" class="btn btn-primary" ng-disabled='disableStart'>Start</button>
@@ -36,7 +36,7 @@
 		{{ displayResult }}
 		<form name="name">
 			<label ng-repeat="answer in answerArray track by $index">
-				<input name='name' type="radio" ng-model="$parent.multipleChoiceAnswer" ng-value="answer.details.title">  {{answer.details.title}}
+				<input name='name' type="radio" ng-model="$parent.multipleChoiceAnswer" ng-value="answer">  {{answer}}
 			</label>		
 		</form>
 
@@ -54,9 +54,9 @@
 
 	<div class="lightbox" ng-hide='replayBox' ng-click='hideReplay()'>
 			<div class="content">
-				<p>You scored {{score}} points, great job! <br><br>To play again click anywhere and choose either a year or genre.</p>
+				<p>You scored {{score}} points, great job! <br><br>To play again click anywhere and choose either a year or genre.</p><br><br>
+				<h3>Top Scores</h3>
 				<div ng-repeat="scores in scoresArray" class="list">
-					<h3>Top Scores</h3>
 					<p> {{scores}} </p>
 				</div>
 			
@@ -64,6 +64,12 @@
 	</div>
 	</div>
 	
+	<div class="outerIntro lightbox" ng-show='loadingBox'>
+		<div class="content innerIntro">
+			<h3>Loading... please chill out for a second</h3>
+			<img src="http://www.tejadirects.com/includes/images/loading.gif">
+		</div>
+	</div>
 
 </body>
 </html>
